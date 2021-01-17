@@ -3,5 +3,9 @@
   "private": true,
   "devDependencies": {
     "lerna": "^3.22.1"
+  },
+  "scripts": {
+    "api:up": "cd packages/api; docker-compose up",
+    "api:down": "cd packages/api; docker-compose down"
   }
 }

@@ -1,0 +1,100 @@
+datasource postgres {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Types {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+}
+
+model Approvals {
+  changeData   String
+  createdAt    DateTime @default(now())
+  guide        Guide
+  id           String   @id @default(cuid())
+  originalData String
+  owner        User     @relation("ApprovalsOwner", fields: [ownerId], references: [id])
+  ownerId      String
+  requestor    User     @relation("ApprovalsRequestor", fields: [requestorId], references: [id])
+  requestorId  String
+  updatedAt    DateTime @updatedAt
+}
+
+model Device {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  name      String
+  updatedAt DateTime @updatedAt
+  category  Category
+}
+
+model Guide {
+  createdAt    DateTime  @default(now())
+  id           String    @id @default(cuid())
+  updatedAt    DateTime  @updatedAt
+  obsolete     DateTime?
+  title        String?
+  conclusion   String?
+  publishedOn  DateTime?
+  introduction String?
+  type         String?
+  category     Category?
+  user         User?
+  device       Device?
+}
+
+model Line {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  text      String?
+  bullet    String
+  level     Int
+  orderBy   Int
+  step      Step?
+}
+
+model Step {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String?
+  orderBy   Int
+  guide     Guide?
+}
+
+model Notification {
+  createdAt DateTime  @default(now())
+  data      String?
+  id        String    @id @default(cuid())
+  readOn    DateTime?
+  type      String?
+  updatedAt DateTime  @updatedAt
+}
+
+model User {
+  id                 String      @id @default(cuid())
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  firstName          String?
+  lastName           String?
+  username           String      @unique
+  password           String
+  roles              String[]
+  approvalsRequested Approvals[] @relation("ApprovalsOwner")
+  approvalsPending   Approvals[] @relation("ApprovalsRequestor")
+}
